@@ -6,7 +6,81 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPu
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+from PyQt6.QtCore import QThread, pyqtSignal, Qt
+import os
 
+class FileSizeWorker(QThread):
+    progress_updated = pyqtSignal(int)   # Tín hiệu cập nhật tiến trình
+    result_ready = pyqtSignal(list, object)  # Dùng object để tránh ép kiểu
+
+
+    def __init__(self, folder_path, include_subfolders):
+        super().__init__()
+        self.folder_path = folder_path
+        self.include_subfolders = include_subfolders
+
+    def get_folder_size(self, folder_path):
+        """Tính tổng dung lượng của tất cả file bên trong (bao gồm thư mục con)."""
+        total_size = 0
+        try:
+            for root, _, files in os.walk(folder_path):  # Duyệt qua tất cả thư mục con
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    try:
+                        total_size += os.path.getsize(file_path)
+                    except Exception as e:
+                        print(f"Lỗi khi đọc file {file_path}: {e}")
+        except Exception as err:
+            print("get_folder_size - " , err)
+        return total_size
+
+    def run(self):
+        file_data = []
+        total_size = 0
+        file_list = []
+
+        # Lấy danh sách file cần tính toán
+        if self.include_subfolders:
+            for root, _, files in os.walk(self.folder_path):
+                for file in files:
+                    file_list.append(os.path.join(root, file))
+        else:
+            # file_list = [os.path.join(self.folder_path, f) for f in os.listdir(self.folder_path) if os.path.isfile(os.path.join(self.folder_path, f))]
+            file_list = [
+                os.path.join(self.folder_path, f)
+                for f in os.listdir(self.folder_path)
+                if os.path.isfile(os.path.join(self.folder_path, f)) or os.path.isdir(os.path.join(self.folder_path, f))
+            ]
+
+        total_files = len(file_list)
+
+        for index, item in enumerate(file_list):
+            item_path = os.path.join(self.folder_path, item)
+
+            try:
+                if os.path.isfile(item_path):  # Nếu là file
+                    size_bytes = os.path.getsize(item_path)
+                    size_kb = size_bytes / 1024
+                    file_data.append([os.path.basename(item), size_kb, "KB", item_path])
+                    total_size += size_kb
+
+                elif os.path.isdir(item_path):  # Nếu là thư mục
+                    folder_size_bytes = self.get_folder_size(item_path)  # Tính tổng kích thước thư mục
+                    folder_size_kb = folder_size_bytes / 1024
+                    file_data.append([f"📂 {os.path.basename(item)}" , folder_size_kb, "KB", item_path])
+                    total_size += folder_size_kb
+
+            except Exception as e:
+                print(f"Lỗi khi đọc {item_path}: {e}")
+
+            # Cập nhật tiến trình
+            progress = int((index + 1) / total_files * 100)
+            self.progress_updated.emit(progress)
+
+        # Gửi kết quả về giao diện
+        # self.result_ready.emit(file_data, round(total_size, 2))  # Làm tròn tổng dung lượng
+        print(f"DEBUG - total_size trước khi emit: {total_size} KB, kiểu dữ liệu: {type(total_size)}")
+        self.result_ready.emit(file_data, total_size)
 
 
 class FileSizeChecker(QWidget):
@@ -94,82 +168,143 @@ class FileSizeChecker(QWidget):
             folder_path = urls[0].toLocalFile()
             if os.path.isdir(folder_path):  # Kiểm tra xem có phải thư mục không
                 self.label.setText(f"Thư mục đã chọn: {folder_path}")
-                self.list_files(folder_path)
+                self.get_folder_size(folder_path)
 
     def select_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Chọn thư mục")
         if folder:
             self.label.setText(f"Thư mục đã chọn: {folder}")
-            self.list_files(folder)
+            self.get_folder_size(folder)
 
     def get_folder_size(self, folder):
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(folder):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                if os.path.exists(fp):
-                    total_size += os.path.getsize(fp)
-        return total_size
 
-    def add_file_data(self, file, size_bytes):
-        if size_bytes >= 1024 * 1024:
-            size_display = size_bytes / (1024 * 1024)
-            unit = "MB"
-        elif size_bytes >= 1024:
-            size_display = size_bytes / 1024
-            unit = "KB"
-        else:
-            size_display = size_bytes
-            unit = "Bytes"
+        self.table.setRowCount(0)  # Xóa dữ liệu cũ
+        self.progress_bar.setValue(0)  # Reset tiến trình
+        self.total_label.setText("Đang tính toán...")  # Cập nhật trạng thái
 
-        self.file_data.append((file, size_display, unit, size_bytes))
+        self.worker = FileSizeWorker(folder, self.detail_checkbox.isChecked())
+        self.worker.progress_updated.connect(self.progress_bar.setValue)
+        self.worker.result_ready.connect(self.display_results)
+        self.worker.start()  # Chạy luồng tính toán
 
-    def list_files(self, folder):
-        self.folder = folder
-        self.file_data = []
-        total_size = 0
+    def display_results(self, file_data, total_size):
+        self.table.setRowCount(0)  # Xóa dữ liệu cũ trong bảng
+        try:
+            # Sắp xếp theo dung lượng giảm dần (chuyển về float để so sánh)
+            file_data.sort(key=lambda x: float(x[1]), reverse=True)
+            # Chuyển đổi dung lượng sang đơn vị phù hợp
+            def convert_size(size_kb):
+                if size_kb >= 1024 * 1024:
+                    return f"{size_kb / (1024 * 1024):.2f}", "GB"
+                elif size_kb >= 1024:
+                    return f"{size_kb / 1024:.2f}", "MB"
+                else:
+                    return f"{size_kb:.2f}","KB"
 
-        files_list = []
-        if self.detail_checkbox.isChecked():
-            for dirpath, _, filenames in os.walk(folder):
-                for file in filenames:
-                    files_list.append(os.path.join(dirpath, file))
-        else:
-            files_list = [os.path.join(folder, file) for file in os.listdir(folder)]
+            show_full_path = self.detail_checkbox.isChecked()  # Kiểm tra trạng thái checkbox
 
-        self.progress_bar.setMaximum(len(files_list))
+            # Chuyển đổi đơn vị dung lượng cho từng file
+            formatted_data = []
+            for file_info in file_data:
+                file_name = file_info[0] if not show_full_path else file_info[3]
+                size, unit = convert_size(file_info[1])
+                formatted_data.append([file_name, size, unit])
 
-        for index, file_path in enumerate(files_list):
-            if os.path.isfile(file_path):
-                size_bytes = os.path.getsize(file_path)
-                total_size += size_bytes
-            elif os.path.isdir(file_path):
-                size_bytes = self.get_folder_size(file_path)
-                total_size += size_bytes
-            else:
-                size_bytes = 0
 
-            self.add_file_data(file_path, size_bytes)
-            self.progress_bar.setValue(index + 1)
 
-        self.file_data.sort(key=lambda x: x[3], reverse=True)
+            # Cập nhật bảng hiển thị
+            self.table.setRowCount(len(formatted_data))
+            for row, (file_name, size, unit) in enumerate(formatted_data):
+                item_name = QTableWidgetItem(file_name)
+                item_size = QTableWidgetItem(size)
+                item_unit = QTableWidgetItem(unit)
 
-        self.table.setRowCount(len(self.file_data))
-        for i, (file, size_display, unit, _) in enumerate(self.file_data):
-            self.table.setItem(i, 0, QTableWidgetItem(file))
+                item_size.setTextAlignment(0x0004 | 0x0080)  # Căn giữa
+                item_unit.setTextAlignment(0x0004 | 0x0080)  # Căn giữa
 
-            item_size = QTableWidgetItem(f"{size_display:.2f}" if isinstance(size_display, float) else size_display)
-            item_size.setTextAlignment(0x0002 | 0x0080)
-            self.table.setItem(i, 1, item_size)
+                self.table.setItem(row, 0, item_name)
+                self.table.setItem(row, 1, item_size)
+                self.table.setItem(row, 2, item_unit)
+            # self.table.setRowCount(len(file_data))
+            # for row, data in enumerate(file_data):
+            #     for col, value in enumerate(data):
+            #         item = QTableWidgetItem(value)
+            #         item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            #         self.table.setItem(row, col, item)
+            print(f"DEBUG - Kiểu dữ liệu total_size: {type(total_size)}, Giá trị: {total_size}")
 
-            item_unit = QTableWidgetItem(unit)
-            item_unit.setTextAlignment(0x0004 | 0x0080)
-            self.table.setItem(i, 2, item_unit)
+            if not isinstance(total_size, (int, float)):
+                try:
+                    total_size = float(total_size)  # Chuyển thành float nếu bị đổi kiểu
+                except ValueError:
+                    print("Lỗi: Không thể chuyển đổi total_size sang float")
+                    total_size = 0
+            total_size_formated , unit = convert_size(total_size)
 
-        total_size_display, total_unit = (total_size / (1024 * 1024), "MB") if total_size >= 1024 * 1024 else (
-        total_size / 1024, "KB") if total_size >= 1024 else (total_size, "Bytes")
-        self.total_label.setText(f"Tổng dung lượng: {total_size_display:.2f} {total_unit}")
-        self.progress_bar.setValue(len(files_list))
+            print(f"DEBUG - total_size sau khi xử lý: {total_size_formated} {unit}")
+            self.total_label.setText(f"Tổng dung lượng: {total_size_formated} {unit}")
+        except Exception as err:
+            print("display_results - exception:", err)
+
+    # def add_file_data(self, file, size_bytes):
+    #     if size_bytes >= 1024 * 1024:
+    #         size_display = size_bytes / (1024 * 1024)
+    #         unit = "MB"
+    #     elif size_bytes >= 1024:
+    #         size_display = size_bytes / 1024
+    #         unit = "KB"
+    #     else:
+    #         size_display = size_bytes
+    #         unit = "Bytes"
+    #
+    #     self.file_data.append((file, size_display, unit, size_bytes))
+    #
+    # def list_files(self, folder):
+    #     self.folder = folder
+    #     self.file_data = []
+    #     total_size = 0
+    #
+    #     files_list = []
+    #     if self.detail_checkbox.isChecked():
+    #         for dirpath, _, filenames in os.walk(folder):
+    #             for file in filenames:
+    #                 files_list.append(os.path.join(dirpath, file))
+    #     else:
+    #         files_list = [os.path.join(folder, file) for file in os.listdir(folder)]
+    #
+    #     self.progress_bar.setMaximum(len(files_list))
+    #
+    #     for index, file_path in enumerate(files_list):
+    #         if os.path.isfile(file_path):
+    #             size_bytes = os.path.getsize(file_path)
+    #             total_size += size_bytes
+    #         elif os.path.isdir(file_path):
+    #             size_bytes = self.get_folder_size(file_path)
+    #             total_size += size_bytes
+    #         else:
+    #             size_bytes = 0
+    #
+    #         self.add_file_data(file_path, size_bytes)
+    #         self.progress_bar.setValue(index + 1)
+    #
+    #     self.file_data.sort(key=lambda x: x[3], reverse=True)
+    #
+    #     self.table.setRowCount(len(self.file_data))
+    #     for i, (file, size_display, unit, _) in enumerate(self.file_data):
+    #         self.table.setItem(i, 0, QTableWidgetItem(file))
+    #
+    #         item_size = QTableWidgetItem(f"{size_display:.2f}" if isinstance(size_display, float) else size_display)
+    #         item_size.setTextAlignment(0x0002 | 0x0080)
+    #         self.table.setItem(i, 1, item_size)
+    #
+    #         item_unit = QTableWidgetItem(unit)
+    #         item_unit.setTextAlignment(0x0004 | 0x0080)
+    #         self.table.setItem(i, 2, item_unit)
+    #
+    #     total_size_display, total_unit = (total_size / (1024 * 1024), "MB") if total_size >= 1024 * 1024 else (
+    #     total_size / 1024, "KB") if total_size >= 1024 else (total_size, "Bytes")
+    #     self.total_label.setText(f"Tổng dung lượng: {total_size_display:.2f} {total_unit}")
+    #     self.progress_bar.setValue(len(files_list))
 
     def export_to_excel(self):
         file_path, _ = QFileDialog.getSaveFileName(self, "Lưu file", "", "Excel Files (*.xlsx)")

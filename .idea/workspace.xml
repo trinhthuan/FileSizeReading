@@ -6,18 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6291455b-0060-45fc-bb88-0a8fb029a5e0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PYZ-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/filesize.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/filesize.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/warn-filesize.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/warn-filesize.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/filesize/xref-filesize.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/xref-filesize.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/filesize.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/filesize.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/filesize.py" beforeDir="false" afterPath="$PROJECT_DIR$/filesize.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/filesize.spec" beforeDir="false" afterPath="$PROJECT_DIR$/filesize.spec" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,5 +137,12 @@
       <updated>1741403509043</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/filesize.py" line="189">
+        <watch expression="total_size" language="Python" />
+      </inline-watch>
+    </watches-manager>
   </component>
 </project>
