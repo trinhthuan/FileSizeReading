@@ -1,11 +1,12 @@
 import sys
 import os
-import pandas as pd
+
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTableWidget, \
-    QTableWidgetItem, QLabel, QCheckBox, QProgressBar, QMessageBox
-from PyQt6.QtGui import QPalette, QColor
+    QTableWidgetItem, QLabel, QCheckBox, QProgressBar, QMessageBox, QHeaderView
+
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+
 
 
 class FileSizeChecker(QWidget):
@@ -14,10 +15,13 @@ class FileSizeChecker(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Kiểm tra dung lượng file")
-        self.setGeometry(100, 100, 800, 500)
+        self.setWindowTitle("FolderSizeMeasure - TrinhThuan - E20250308")
+        self.setGeometry(100, 100, 600, 500)
+        self.setMinimumSize(200, 150)  # Cho phép kéo nhỏ hơn kích thước ban đầu
 
         self.setStyleSheet("background-color: #f0f0f0;")
+        # Kích hoạt kéo thả
+        self.setAcceptDrops(True)
 
         layout = QVBoxLayout()
 
@@ -50,16 +54,25 @@ class FileSizeChecker(QWidget):
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Tên file", "Dung lượng", "Đơn vị"])
         self.table.setStyleSheet("background-color: white; border: 1px solid #ccc;")
-        self.table.setColumnWidth(0, 500)  # Tăng chiều rộng cột tên file
-        self.table.setColumnWidth(1, 100)
-        self.table.setColumnWidth(2, 100)
+
+        # Cột đầu tiên mở rộng theo bảng
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+
+        # Các cột khác chỉ điều chỉnh theo nội dung
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+
+        # self.table.horizontalHeader().setStretchLastSection(True)  # Giãn cột cuối cùng để không bị thừa khoảng trống
+        # self.table.setColumnWidth(0, 400)  # Tăng chiều rộng cột tên file
+        # self.table.setColumnWidth(1, 100)
+        # self.table.setColumnWidth(2, 100)
         layout.addWidget(self.table)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setFixedHeight(10)  # Đặt chiều cao thanh tiến trình
-        self.progress_bar.setFixedWidth(800)  # Đặt chiều rộng thanh tiến trình
+        # self.progress_bar.setFixedWidth(600)  # Đặt chiều rộng thanh tiến trình
         self.progress_bar.setStyleSheet(
-            "QProgressBar { border: 0px solid grey; border-radius: 5px; text-align: right; height: 10px; width: 500px; } "
+            "QProgressBar { border: 0px solid grey; border-radius: 5px; text-align: center; height: 10px; width: 500px; } "
             "QProgressBar::chunk { background-color: #00FFCC; width: 10px; }")
         layout.addWidget(self.progress_bar)
 
@@ -68,6 +81,20 @@ class FileSizeChecker(QWidget):
         layout.addWidget(self.total_label)
 
         self.setLayout(layout)
+
+    def dragEnterEvent(self, event):
+        """ Khi người dùng kéo một thư mục vào giao diện """
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        """ Khi người dùng thả thư mục vào giao diện """
+        urls = event.mimeData().urls()
+        if urls:
+            folder_path = urls[0].toLocalFile()
+            if os.path.isdir(folder_path):  # Kiểm tra xem có phải thư mục không
+                self.label.setText(f"Thư mục đã chọn: {folder_path}")
+                self.list_files(folder_path)
 
     def select_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Chọn thư mục")
@@ -132,7 +159,7 @@ class FileSizeChecker(QWidget):
             self.table.setItem(i, 0, QTableWidgetItem(file))
 
             item_size = QTableWidgetItem(f"{size_display:.2f}" if isinstance(size_display, float) else size_display)
-            item_size.setTextAlignment(0x0004 | 0x0080)
+            item_size.setTextAlignment(0x0002 | 0x0080)
             self.table.setItem(i, 1, item_size)
 
             item_unit = QTableWidgetItem(unit)

@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="6291455b-0060-45fc-bb88-0a8fb029a5e0" name="Changes" comment="" />
+    <list default="true" id="6291455b-0060-45fc-bb88-0a8fb029a5e0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/Analysis-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/EXE-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PKG-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PYZ-00.pyz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/PYZ-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/base_library.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/filesize.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/filesize.pkg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/warn-filesize.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/warn-filesize.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/filesize/xref-filesize.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/filesize/xref-filesize.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/filesize.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/filesize.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filesize.py" beforeDir="false" afterPath="$PROJECT_DIR$/filesize.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filesize.spec" beforeDir="false" afterPath="$PROJECT_DIR$/filesize.spec" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/filesize.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2u160MJensCKDuoglCBrkZhDPzU" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -21,12 +48,17 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.ee.executor": "Run",
+    "Python.filesize (1).executor": "Run",
+    "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master"
+    "git-widget-placeholder": "master",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.filesize (1)">
+    <configuration name="ee" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="File_Size" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -39,7 +71,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ee.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -48,6 +80,56 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="filesize (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="File_Size" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/filesize.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="filesize" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="File_Size" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="D:\Python\File_Size\filesize.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.filesize (1)" />
+        <item itemvalue="Python.ee" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -66,16 +148,5 @@
       <updated>1741403509043</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
